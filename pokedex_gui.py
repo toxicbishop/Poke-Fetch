@@ -87,6 +87,10 @@ class InputValidator:
         
         return True
 
+# Theme must be set BEFORE creating the CTk window
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
+
 class PokedexApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -97,9 +101,8 @@ class PokedexApp(ctk.CTk):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        # Theme
-        ctk.set_appearance_mode("Dark")
-        ctk.set_default_color_theme("blue")
+        # Store image reference to prevent garbage collection
+        self._current_ctk_image = None
 
         # Variables
         self.current_pokemon_data = None
@@ -152,21 +155,29 @@ class PokedexApp(ctk.CTk):
         self.stats_frame.pack(fill="x", expand=True)
         
         self.stat_widgets = {}
-        for stat_name in ["hp", "attack", "defense", "speed"]:
+        stat_display = [
+            ("hp",              "HP"),
+            ("attack",          "ATK"),
+            ("defense",         "DEF"),
+            ("special-attack",  "SP.ATK"),
+            ("special-defense", "SP.DEF"),
+            ("speed",           "SPD"),
+        ]
+        for stat_key, stat_label in stat_display:
             row = ctk.CTkFrame(self.stats_frame, fg_color="transparent")
             row.pack(fill="x", pady=2)
-            
-            lbl = ctk.CTkLabel(row, text=stat_name.upper(), width=80, anchor="w", font=ctk.CTkFont(size=11, weight="bold"))
+
+            lbl = ctk.CTkLabel(row, text=stat_label, width=70, anchor="w", font=ctk.CTkFont(size=11, weight="bold"))
             lbl.pack(side="left")
-            
+
             progress = ctk.CTkProgressBar(row, height=10, progress_color="#DD2D44")
             progress.set(0)
             progress.pack(side="left", fill="x", expand=True, padx=10)
-            
-            val_lbl = ctk.CTkLabel(row, text="0", width=30)
+
+            val_lbl = ctk.CTkLabel(row, text="0", width=35)
             val_lbl.pack(side="right")
-            
-            self.stat_widgets[stat_name] = (progress, val_lbl)
+
+            self.stat_widgets[stat_key] = (progress, val_lbl)
 
         # Abilities & Types
         self.details_frame = ctk.CTkFrame(self.info_container, fg_color="transparent")
@@ -197,14 +208,20 @@ class PokedexApp(ctk.CTk):
 
     def fetch_pokemon_data(self, name):
         try:
-            response = requests.get(f"{BASE_URL}{name}")
+            response = requests.get(f"{BASE_URL}{name}", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 self.after(0, lambda: self.update_ui(data))
+            elif response.status_code == 404:
+                self.after(0, lambda: self.show_error(f"'{name.capitalize()}' not found"))
             else:
-                self.after(0, lambda: self.show_error(f"Pokemon '{name}' not found"))
+                self.after(0, lambda: self.show_error(f"API error (HTTP {response.status_code})"))
+        except requests.exceptions.Timeout:
+            self.after(0, lambda: self.show_error("Request timed out — try again"))
+        except requests.exceptions.ConnectionError:
+            self.after(0, lambda: self.show_error("No internet connection"))
         except Exception as e:
-            self.after(0, lambda: self.show_error("Network Error"))
+            self.after(0, lambda: self.show_error("Unexpected error occurred"))
         finally:
             self.after(0, lambda: self.search_button.configure(state="normal"))
 
@@ -231,36 +248,44 @@ class PokedexApp(ctk.CTk):
         abilities = [a['ability']['name'].replace('-', ' ').title() for a in data['abilities']]
         self.ability_label.configure(text=f"Abilities: {', '.join(abilities)}")
 
-        # Load Image
-        image_url = data['sprites']['other']['official-artwork']['front_default']
-        if not image_url:
-            image_url = data['sprites']['front_default']
-            
+        # Load Image — safely navigate nested sprite dict to avoid KeyError
+        image_url = (
+            data.get('sprites', {}).get('other', {}).get('official-artwork', {}).get('front_default')
+            or data.get('sprites', {}).get('front_default')
+        )
+
         if image_url:
-            thread = threading.Thread(target=self.load_pokemon_image, args=(image_url,))
+            thread = threading.Thread(target=self.load_pokemon_image, args=(image_url,), daemon=True)
             thread.start()
+        else:
+            self.pokemon_img_label.configure(image=None, text="No Image Available")
 
     def load_pokemon_image(self, url):
         try:
-            response = requests.get(url)
-            img_data = response.content
-            img = Image.open(io.BytesIO(img_data))
-            
-            # Resize image
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            img = Image.open(io.BytesIO(response.content))
+
+            # Store reference on self to prevent garbage collection
             ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(300, 300))
-            
-            self.after(0, lambda: self.pokemon_img_label.configure(image=ctk_img, text=""))
+            self._current_ctk_image = ctk_img
+
+            self.after(0, lambda: self.pokemon_img_label.configure(image=self._current_ctk_image, text=""))
         except Exception:
-            self.after(0, lambda: self.pokemon_img_label.configure(text="Image Loading Failed"))
+            self.after(0, lambda: self.pokemon_img_label.configure(image=None, text="Image Load Failed"))
 
     def show_error(self, message):
         self.status_label.configure(text=message, text_color="#EF4444")
         self.name_label.configure(text="---")
         self.id_label.configure(text="#000")
+        # Clear stored image reference and reset label
+        self._current_ctk_image = None
         self.pokemon_img_label.configure(image=None, text="Pokémon Not Found")
         for progress, lbl in self.stat_widgets.values():
             progress.set(0)
             lbl.configure(text="0")
+        self.type_label.configure(text="Type: ---")
+        self.ability_label.configure(text="Abilities: ---")
 
 if __name__ == "__main__":
     app = PokedexApp()

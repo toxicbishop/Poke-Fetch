@@ -74,34 +74,43 @@ def get_pokemon_info(name):
     url = f"{base_url}pokemon/{sanitized_name}/"
     
     try:
-        response = requests.get(url)
-        
+        response = requests.get(url, timeout=10)
+
         if response.status_code == 200:
             pokemon_data = response.json()
             print("Data retrieved successfully")
             return pokemon_data
+        elif response.status_code == 404:
+            print(f"Pokémon '{sanitized_name}' not found (404)")
+            return None
         else:
             print(f"Failed to retrieve data. Status code: {response.status_code}")
             return None
-            
+
+    except requests.exceptions.Timeout:
+        print("Request timed out. Please try again.")
+        return None
+    except requests.exceptions.ConnectionError:
+        print("No internet connection.")
+        return None
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
 
 # --- Main Execution ---
-pokemon_name = "pikachu"
-pokemon_info = get_pokemon_info(pokemon_name)
+if __name__ == "__main__":
+    pokemon_name = "pikachu"
+    pokemon_info = get_pokemon_info(pokemon_name)
 
-if pokemon_info:
-    
-    print("-----------------------------")
-    print(f"Name: {pokemon_info['name'].capitalize()}")
-    print(f"ID: {pokemon_info['id']}")
-    print(f"Height: {pokemon_info['height']}")
-    print(f"Weight: {pokemon_info['weight']}")
-    print("Abilities:")
-    for ability in pokemon_info['abilities']:
-        print(f"- {ability['ability']['name'].replace('-', ' ').title()}")
-    print("-----------------------------")
-else:
-    print("No data found to display.")
+    if pokemon_info:
+        print("-----------------------------")
+        print(f"Name: {pokemon_info['name'].capitalize()}")
+        print(f"ID: {pokemon_info['id']}")
+        print(f"Height: {pokemon_info['height']}")
+        print(f"Weight: {pokemon_info['weight']}")
+        print("Abilities:")
+        for ability in pokemon_info['abilities']:
+            print(f"- {ability['ability']['name'].replace('-', ' ').title()}")
+        print("-----------------------------")
+    else:
+        print("No data found to display.")

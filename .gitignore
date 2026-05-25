@@ -3,14 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# PyInstaller
+# PyInstaller build artefacts (source .spec IS tracked)
 *.manifest
-*.spec
 build/
 dist/
 
-# Example files
+# Binary outputs — uploaded as GitHub Release assets instead
 *.exe
+*.msi
 
 # Environment
 .env

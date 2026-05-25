@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package
+    Name="Pokédex"
+    Manufacturer="ToxicBishop"
+    Version="1.0.0"
+    UpgradeCode="A3F2B1C0-4D5E-4F6A-8B7C-9D0E1F2A3B4C"
+    Language="1033"
+    Codepage="1252"
+    InstallerVersion="500">
+
+    <!-- Allow clean upgrades: remove old version before installing new one -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Pokédex is already installed." />
+
+    <!-- Embed the cabinet directly in the MSI -->
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- ================================================================
+         Icon (shown in Apps & Features and installer)
+         ================================================================ -->
+    <Icon Id="PokedexIcon" SourceFile="pokedex.ico" />
+    <Property Id="ARPPRODUCTICON" Value="PokedexIcon" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/toxicbishop/PokeAPI-Data-Fetcher" />
+
+    <!-- ================================================================
+         Directory structure
+         ================================================================ -->
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Pokedex" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="AppStartMenuFolder" Name="Pokédex" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- ================================================================
+         Components
+         ================================================================ -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <!-- Main executable -->
+      <Component Id="MainExe" Guid="B1C2D3E4-F5A6-7B8C-9D0E-1F2A3B4C5D6E">
+        <File
+          Id="PokedexExe"
+          Source="..\dist\Pokedex.exe"
+          KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Start Menu shortcut component -->
+    <Component Id="StartMenuShortcut" Guid="C2D3E4F5-A6B7-8C9D-0E1F-2A3B4C5D6E7F" Directory="AppStartMenuFolder">
+      <Shortcut
+        Id="StartMenuShortcutEntry"
+        Name="Pokédex"
+        Description="Modern Pokédex powered by PokéAPI"
+        Target="[INSTALLFOLDER]Pokedex.exe"
+        WorkingDirectory="INSTALLFOLDER"
+        Icon="PokedexIcon" />
+      <RemoveFolder Id="CleanUpStartMenuFolder" Directory="AppStartMenuFolder" On="uninstall" />
+      <RegistryValue
+        Root="HKCU"
+        Key="Software\ToxicBishop\Pokedex"
+        Name="StartMenuShortcut"
+        Type="integer"
+        Value="1"
+        KeyPath="yes" />
+    </Component>
+
+    <!-- Desktop shortcut component -->
+    <Component Id="DesktopShortcut" Guid="D3E4F5A6-B7C8-9D0E-1F2A-3B4C5D6E7F8A" Directory="DesktopFolder">
+      <Shortcut
+        Id="DesktopShortcutEntry"
+        Name="Pokédex"
+        Description="Modern Pokédex powered by PokéAPI"
+        Target="[INSTALLFOLDER]Pokedex.exe"
+        WorkingDirectory="INSTALLFOLDER"
+        Icon="PokedexIcon" />
+      <RemoveFolder Id="CleanUpDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+      <RegistryValue
+        Root="HKCU"
+        Key="Software\ToxicBishop\Pokedex"
+        Name="DesktopShortcut"
+        Type="integer"
+        Value="1"
+        KeyPath="yes" />
+    </Component>
+
+    <!-- ================================================================
+         Feature (what gets installed)
+         ================================================================ -->
+    <Feature Id="ProductFeature" Title="Pokédex" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+  </Package>
+</Wix>
