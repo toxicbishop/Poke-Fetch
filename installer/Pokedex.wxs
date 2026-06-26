@@ -21,7 +21,7 @@
          ================================================================ -->
     <Icon Id="PokedexIcon" SourceFile="pokedex.ico" />
     <Property Id="ARPPRODUCTICON" Value="PokedexIcon" />
-    <Property Id="ARPHELPLINK" Value="https://github.com/toxicbishop/PokeAPI-Data-Fetcher" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/toxicbishop/PokeFetch" />
 
     <!-- ================================================================
          Directory structure

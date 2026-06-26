@@ -1,4 +1,4 @@
-﻿# Pokédex Data Fetcher & GUI
+# Pokédex Data Fetcher & GUI
 
 A modern, dual-interface Python application to fetch and display Pokémon data using the [PokéAPI](https://pokeapi.co/). Features both a quick **Command Line Interface (CLI)** for scripts and a beautiful **Graphical User Interface (GUI)** for a visual experience.
 
@@ -32,8 +32,8 @@ Download Pokedex.exe from the [Releases](../../releases) page and double-click i
 **Prerequisites:** Python 3.8+
 
 `bash
-git clone https://github.com/toxicbishop/PokeAPI-Data-Fetcher.git
-cd PokeAPI-Data-Fetcher
+git clone https://github.com/toxicbishop/PokeFetch.git
+cd PokeFetch
 pip install -r requirements.txt
 `
 
