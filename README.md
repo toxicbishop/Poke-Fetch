@@ -32,8 +32,8 @@ Download Pokedex.exe from the [Releases](../../releases) page and double-click i
 **Prerequisites:** Python 3.8+
 
 `bash
-git clone https://github.com/toxicbishop/PokeFetch.git
-cd PokeFetch
+git clone https://github.com/toxicbishop/Poke-Fetch.git
+cd Poke-Fetch
 pip install -r requirements.txt
 `
 
