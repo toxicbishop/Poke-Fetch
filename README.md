@@ -1,4 +1,4 @@
-﻿# 🎮 Pokédex Data Fetcher & GUI
+# Pokédex Data Fetcher & GUI
 
 A modern, dual-interface Python application to fetch and display Pokémon data using the [PokéAPI](https://pokeapi.co/). Features both a quick **Command Line Interface (CLI)** for scripts and a beautiful **Graphical User Interface (GUI)** for a visual experience.
 
@@ -6,7 +6,7 @@ A modern, dual-interface Python application to fetch and display Pokémon data u
 
 ---
 
-## ✨ Features
+## Features
 
 - **CLI Mode**: Quickly fetch stats, height, weight, and abilities in the terminal.
 - **GUI Mode**: A modern, dark-themed interface built with customtkinter.
@@ -16,11 +16,10 @@ A modern, dual-interface Python application to fetch and display Pokémon data u
   - Displays Types and Abilities.
 - **Windows MSI Installer**: Install via Pokedex-Setup.msi — adds Desktop & Start Menu shortcuts and a proper uninstaller.
 - **Portable EXE**: Standalone executable — no Python installation needed.
-- **Dockerized**: Container-ready for isolated CLI execution.
 
 ---
 
-## 🖥️ Installation
+## Installation
 
 ### Option A — Windows Installer (recommended)
 Download Pokedex-Setup.msi from the [Releases](../../releases) page and run it.
@@ -32,33 +31,33 @@ Download Pokedex.exe from the [Releases](../../releases) page and double-click i
 
 **Prerequisites:** Python 3.8+
 
-`ash
-git clone https://github.com/toxicbishop/PokeAPI-Data-Fetcher.git
-cd PokeAPI-Data-Fetcher
+`bash
+git clone https://github.com/toxicbishop/Poke-Fetch.git
+cd Poke-Fetch
 pip install -r requirements.txt
 `
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Graphical Interface (GUI)
-`ash
+`bash
 python pokedex_gui.py
 `
 Enter a Pokémon name (e.g., charizard) and press **Enter** or click **Search**.
 
 ### Command Line (CLI)
-`ash
+`bash
 python request_API_From_PokeAPI.py
 `
 
 ---
 
-## 📦 Distribution
+## Distribution
 
 ### MSI Installer (recommended for sharing)
-`ash
+`bash
 # Requires WiX 4
 dotnet tool install --global wix --version 4.0.5
 python -m PyInstaller Pokedex.spec --noconfirm
@@ -66,7 +65,7 @@ wix build installer/Pokedex.wxs -o dist/Pokedex-Setup.msi
 `
 
 ### Portable EXE
-`ash
+`bash
 pip install pyinstaller
 python -m PyInstaller Pokedex.spec --noconfirm
 # Output: dist/Pokedex.exe
@@ -74,38 +73,20 @@ python -m PyInstaller Pokedex.spec --noconfirm
 
 ---
 
-## 🐳 Docker Support
-
-**Build:**
-`ash
-docker build -t pokedex-app .
-`
-
-**Run CLI:**
-`ash
-docker run -it pokedex-app
-`
-
-**Run GUI (Linux with X11):**
-`ash
-docker run -e DISPLAY= -v /tmp/.X11-unix:/tmp/.X11-unix pokedex-app python pokedex_gui.py
-`
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Library |
 |-------|---------|
 | GUI framework | customtkinter |
 | Image handling | Pillow |
-| HTTP requests | equests |
+| HTTP requests | 
+equests |
 | Packaging | PyInstaller + WiX 4 |
 | Data source | [PokéAPI v2](https://pokeapi.co/api/v2/) |
 
 ---
 
-## 📄 License
+## License
 
 This project is open source under the [MIT License](LICENSE).
 Data provided by [PokéAPI](https://pokeapi.co/).
